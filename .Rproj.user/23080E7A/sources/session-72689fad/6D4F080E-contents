@@ -1,0 +1,140 @@
+library(tidyverse)
+
+gapminder_1997 <- read_csv("gapminder_1997.csv") # "chr" stands for character, "dlb" stands for a numerical variable
+str(gapminder_1997)
+
+# Useful functions for navigating RStudio
+?read_csv # takes you to a file that explains all the commands & more
+getwd() # tells you your path & working directory
+setwd() # sets the working directory
+
+# R is just a big calculator
+sum(5,6) # sums two numbers
+round(3.14159, 3)
+?round()
+round(2, 3.14159) # an example of how the numbers are in the wrong places
+round(x = 3.14159, digits = 2)
+
+?ggplot # the "+" sign is how we add layers in the mapping portion
+ggplot(data = gapminder_1997) + 
+  aes(x = gdpPercap) +
+  labs(x = "GDP Per Capita") + # layer that labels the x & y axes
+  aes(y = lifeExp) +
+  labs(y = "Life Expectancy") +
+  geom_point() + 
+  labs(title = "Do people in wealthy countries live longer?") + # adds a title
+  aes(color = continent) + # adds color to the continent variable
+  scale_color_brewer(palette = "Set1") + # changes the color via "r color brewer" 
+  aes(size = pop/1000000) + # added another layer that added population as size via circle
+  labs(size = "Population (in millions)") #alters the title of the legend
+
+# Now we are going to make a more succinct ggplot command since we reused a lot of the commands
+# Below is all the code together
+ggplot(data = gapminder_1997) +
+  aes(x = gdpPercap, y = lifeExp, color = continent, size = pop/100000) +
+  geom_point() +
+  scale_color_brewer(palette = "Set1") +
+  labs(x = "GDP Per Capita", y = "Life Expectancy",
+       title = "Do people in wealthy countries live longer?",
+       size = "Population (in millions)")
+
+# load in a larger dataset
+
+gapminder_data <- read_csv("gapminder_data.csv")
+str(gapminder_data)  
+dim(gapminder_data)
+
+ggplot(data = gapminder_data) +
+  aes(x = year, y = lifeExp, group = country, color = continent) +
+  geom_line() # adding the group variable made it a spaghetti plot
+
+
+# discrete plots
+
+# Boxplot
+ggplot(data = gapminder_1997) +
+  aes(x = continent, y = lifeExp) +
+  geom_boxplot()
+
+# violin plot
+ggplot(data = gapminder_1997) +
+  aes(x = continent, y = lifeExp) +
+  geom_violin() +
+  geom_point() # this command adds another layer with the actual points
+### Important note: the last line is the top layer!
+
+# violin plot
+ggplot(data = gapminder_1997) +
+  aes(x = continent, y = lifeExp) +
+  geom_violin() +
+  geom_jitter() # adds the points in a jitter fashion, easier to see the points
+
+
+# Master aesthetics
+ggplot(data = gapminder_1997, aes(x = continent, y = lifeExp)) +
+  geom_violin() +
+  geom_jitter(aes(size = pop), color = "pink") # there are differences btw 'fill' and 'color'
+
+ggplot(data = gapminder_1997, aes(x = continent, y = lifeExp)) +
+  geom_violin(aes(fill = continent))
+
+ggplot(data = gapminder_1997, aes(x = continent, y = lifeExp)) +
+  geom_violin(fill = "springgreen")
+
+
+# Univariate plots
+
+ggplot(gapminder_1997) + 
+  aes(x = lifeExp) +
+  geom_histogram(bins = 15)
+
+# Plot themes
+ggplot(gapminder_1997) +
+  aes(x = lifeExp) +
+  geom_histogram(bins = 20) +
+  theme_classic() # one theme
+
+ggplot(gapminder_1997) +
+  aes(x = lifeExp) +
+  geom_histogram(bins = 20) +
+  theme_minimal() # another theme!
+
+ggplot(gapminder_1997) +
+  aes(x = lifeExp) +
+  geom_histogram(bins = 20) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) # there are endless options for this
+# this theme changes the x-axis to 90 degrees and centers it
+
+# facet wrap
+ggplot(gapminder_1997) +
+  aes(x = gdpPercap, y = lifeExp) +
+  geom_point() +
+  facet_wrap(vars(continent)) # super useful for separating out the data, for avoiding overplotting
+
+# facet grid
+ggplot(gapminder_1997) +
+  aes(x = gdpPercap, y = lifeExp) +
+  geom_point() +
+  facet_grid(rows = vars(continent))
+
+# here is a function to save our plots as an object in the environment
+ggsave("awesome_plot.jpg", width = 6, height = 4)
+
+ggsave(awesome_plot,
+       file = "awesome_plot.jpg", 
+       width = 6, height = 4)
+
+# exercise: make violin plot of lifeExp & continent, color mapped to continet, b&w theme
+violin_plot <- ggplot(data = gapminder_1997) +
+  aes(x = continent, y = lifeExp) +
+  geom_violin(aes(color = continent)) +
+  labs(x = "Continent", y = "Life Expectancy (years)") +
+  theme_bw()
+ 
+violin_plot
+
+ggsave(violin_plot, file = "awesome_violin_plot.jpg")
+  
+
+
